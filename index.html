@@ -135,6 +135,7 @@
     <div class="tabs">
       <button type="button" class="tab active" data-tab="img" data-i18n="image">Image</button>
       <button type="button" class="tab" data-tab="vid" data-i18n="video">Video</button>
+      <button type="button" class="tab" data-tab="code" data-i18n="code">WebGL code</button>
     </div>
     <div class="tabpane" data-pane="img">
       <div class="ctrl"><label data-i18n="format">Format</label>
@@ -152,6 +153,17 @@
       <label class="chk"><input type="checkbox" id="vLoop" checked> <span data-i18n="loop">Seamless loop</span></label>
       <p class="muted" id="vInfo"></p>
       <div class="progress hidden" id="vProg"><div></div></div>
+    </div>
+    <div class="tabpane hidden" data-pane="code">
+      <p class="muted" data-i18n="codeInfo">Live WebGL gradient, no dependencies (~8 KB). Scales to any container, crisp at any resolution.</p>
+      <label class="chk"><input type="checkbox" id="cAnim" checked> <span data-i18n="cAnim">Animated</span></label>
+      <label class="chk"><input type="checkbox" id="cFull" checked> <span data-i18n="cFull">Fullscreen background (fixed)</span></label>
+      <div class="row gap wrap" style="margin-top:10px">
+        <button type="button" id="cHtml" class="small" data-i18n="cHtml">Download .html</button>
+        <button type="button" id="cSnippet" class="small ghost" data-i18n="cSnippet">Copy embed snippet</button>
+        <button type="button" id="cJs" class="small ghost" data-i18n="cJs">Download .js module</button>
+      </div>
+      <textarea id="cOut" readonly spellcheck="false"></textarea>
     </div>
     <div class="row gap end">
       <button value="cancel" class="ghost" data-i18n="cancel">Cancel</button>
