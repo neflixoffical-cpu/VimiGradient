@@ -17,6 +17,7 @@ Zero dependencies — pure HTML + JS + WebGL.
 - Canvas presets: 16:9, 9:16, 1:1, 4K, MacBook, iPhone, Twitter header, A4… or any custom size
 - Export **PNG / JPG / WebP** up to 4× scale (up to your GPU limit, usually 8K–16K)
 - Export **animated video (WebM)** with seamless loop, 24/30/60 fps, up to 4K
+- Export as **WebGL code**: standalone `.html`, embed snippet or `.js` file — a live, animated, resolution-independent gradient for any website (~9 KB, no dependencies)
 - Share link (whole design encoded in the URL), save / load `.json`, CSS fallback
 - Undo / redo, keyboard shortcuts, English / Русский
 
