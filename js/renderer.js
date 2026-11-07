@@ -1,5 +1,6 @@
 /* VimiGradient — WebGL renderer. MIT License. */
 (function () {
+ const factory = function () {
   const MAX = 10;
 
   const VERT = `attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}`;
@@ -209,4 +210,7 @@ void main(){
   window.VG = window.VG || {};
   VG.Renderer = Renderer;
   VG.MAX_COLORS = MAX;
+ };
+ factory();
+ VG.RENDERER_SRC = '(' + factory.toString() + ')();';
 })();
