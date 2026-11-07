@@ -10,6 +10,7 @@
       saveJson: 'Сохранить .json', loadJson: 'Открыть .json', savePreset: 'В мои пресеты', css: 'CSS (упрощённо)',
       exportTitle: 'Экспорт', image: 'Картинка', video: 'Видео', format: 'Формат', scale: 'Масштаб', quality: 'Качество',
       duration: 'Длительность (с)', vres: 'Макс. сторона (px)', bitrate: 'Битрейт (Мбит/с)', loop: 'Бесшовный цикл',
+      code: 'WebGL-код', codeInfo: 'Живой WebGL-градиент без зависимостей (~8 КБ). Тянется под любой контейнер, чёткий в любом разрешении.', cAnim: 'Анимация', cFull: 'Фон на весь экран (fixed)', cHtml: 'Скачать .html', cSnippet: 'Копировать сниппет', cJs: 'Скачать .js модуль',
       cancel: 'Отмена', download: 'Скачать',
       'Angle': 'Угол', 'Blend sharpness': 'Резкость смешивания', 'Warp': 'Искажение', 'Warp scale': 'Масштаб искажения',
       'Swirl': 'Завихрение', 'Seed': 'Сид', 'Amount': 'Сила', 'Size (px)': 'Размер (px)', 'Brightness': 'Яркость',
