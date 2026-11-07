@@ -363,7 +363,36 @@
     prog.classList.add('hidden'); bar.style.width = '0'; btn.disabled = false; toast(msg('done'));
     r.gl.getExtension('WEBGL_lose_context')?.loseContext();
   }
-  $('#doExport').onclick = () => (tab === 'img' ? exportImage() : exportVideo());
+  // ---------- WebGL code export ----------
+  function codeState() { const s = clone(state); s.speed = $('#cAnim').checked ? s.speed : 0; return s; }
+  function runtime(sel) {
+    return `${VG.RENDERER_SRC}
+(function(){var S=${JSON.stringify(codeState())};var T=${time.toFixed(3)};
+var c=document.querySelector(${JSON.stringify(sel)});var r=new VG.Renderer(c);var last=performance.now();
+function fit(){var d=Math.min(devicePixelRatio||1,2);var w=Math.max(1,Math.round(c.clientWidth*d)),h=Math.max(1,Math.round(c.clientHeight*d));
+if(c.width!==w||c.height!==h){c.width=w;c.height=h;draw();}}
+function draw(){r.render(S,T,1);}
+function loop(n){T+=(n-last)/1000*S.speed*4;last=n;fit();draw();if(S.speed>0)requestAnimationFrame(loop);}
+addEventListener('resize',function(){fit();draw();});fit();draw();if(S.speed>0)requestAnimationFrame(loop);})();`;
+  }
+  function snippet() {
+    const full = $('#cFull').checked;
+    const css = full ? 'position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;display:block' : 'width:100%;aspect-ratio:' + state.width + '/' + state.height + ';display:block';
+    return `<!-- VimiGradient https://github.com -->\n<canvas id="vimigradient" style="${css}"></canvas>\n<script>\n${runtime('#vimigradient')}\n<\/script>`;
+  }
+  function updateCode() { $('#cOut').value = snippet(); }
+  ['#cAnim', '#cFull'].forEach(s => $(s).addEventListener('change', updateCode));
+  $('#cHtml').onclick = () => {
+    const html = `<!doctype html>\n<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VimiGradient</title>\n<style>html,body{margin:0;height:100%;background:${state.colors[0].color}}</style></head>\n<body>\n${snippet()}\n</body></html>`;
+    download(new Blob([html], { type: 'text/html' }), stamp() + '.html'); toast(msg('done'));
+  };
+  $('#cSnippet').onclick = async () => { try { await navigator.clipboard.writeText(snippet()); toast(msg('copied')); } catch (e) { $('#cOut').select(); } };
+  $('#cJs').onclick = () => {
+    const js = `// VimiGradient — usage: <canvas id="vimigradient"></canvas><script src="vimigradient.js"></script>\n${runtime('#vimigradient')}`;
+    download(new Blob([js], { type: 'text/javascript' }), 'vimigradient.js'); toast(msg('done'));
+  };
+  $$('.tab').forEach(t => t.addEventListener('click', () => { if (t.dataset.tab === 'code') updateCode(); }));
+  $('#doExport').onclick = () => (tab === 'img' ? exportImage() : tab === 'vid' ? exportVideo() : $('#cHtml').click());
 
   // ---------- buttons & keys ----------
   $('#btnRandom').onclick = randomize;
