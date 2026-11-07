@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VimiGradient — free grainy gradient generator</title>
+<meta name="description" content="Free, open-source grainy mesh gradient generator. Export PNG, JPG, WebP up to 8K and animated WebM video.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff6b6b'/%3E%3Cstop offset='.5' stop-color='%23845ef7'/%3E%3Cstop offset='1' stop-color='%2322b8cf'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo"></span>VimiGradient <small>free &amp; open-source</small></div>
+  <div class="top-actions">
+    <button id="btnLang" class="ghost" title="Language">RU</button>
+    <button id="btnUndo" class="ghost" title="Undo (Ctrl+Z)">↶</button>
+    <button id="btnRedo" class="ghost" title="Redo (Ctrl+Shift+Z)">↷</button>
+    <button id="btnRandom" data-i18n="random">🎲 Randomize</button>
+    <button id="btnShare" class="ghost" data-i18n="share">Copy link</button>
+    <button id="btnExport" class="primary" data-i18n="export">Export</button>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="stage" id="stage">
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="gl"></canvas>
+      <div id="handles"></div>
+    </div>
+    <div class="stage-bar">
+      <button id="btnPlay" class="ghost" data-i18n="play">▶ Animate</button>
+      <label class="chk"><input type="checkbox" id="showHandles" checked> <span data-i18n="handles">Show points</span></label>
+      <span class="hint" data-i18n="hint">Drag points · double-click canvas to add · right-click a point to remove</span>
+    </div>
+  </section>
+
+  <aside class="panel" id="panel">
+    <details open>
+      <summary data-i18n="presets">Presets</summary>
+      <div id="presets" class="presets"></div>
+    </details>
+
+    <details open>
+      <summary data-i18n="colors">Colors</summary>
+      <div id="colorList" class="color-list"></div>
+      <div class="row gap">
+        <button id="btnAddColor" class="small" data-i18n="addColor">+ Add color</button>
+        <button id="btnShufflePos" class="small ghost" data-i18n="shuffle">Shuffle positions</button>
+        <button id="btnRandPalette" class="small ghost" data-i18n="randPalette">New palette</button>
+      </div>
+      <div class="ctrl">
+        <label data-i18n="bg">Background</label>
+        <input type="color" id="bgColor">
+      </div>
+    </details>
+
+    <details open>
+      <summary data-i18n="shape">Shape</summary>
+      <div class="ctrl">
+        <label data-i18n="mode">Type</label>
+        <select id="mode">
+          <option value="0">Mesh</option>
+          <option value="1">Linear</option>
+          <option value="2">Radial</option>
+          <option value="3">Conic</option>
+          <option value="4">Waves</option>
+          <option value="5">Blobs</option>
+        </select>
+      </div>
+      <div class="slider" data-key="angle" data-min="0" data-max="360" data-step="1" data-label="Angle"></div>
+      <div class="slider" data-key="softness" data-min="0.3" data-max="6" data-step="0.01" data-label="Blend sharpness"></div>
+      <div class="slider" data-key="warp" data-min="0" data-max="1.5" data-step="0.01" data-label="Warp"></div>
+      <div class="slider" data-key="warpScale" data-min="0.2" data-max="8" data-step="0.01" data-label="Warp scale"></div>
+      <div class="slider" data-key="swirl" data-min="-3" data-max="3" data-step="0.01" data-label="Swirl"></div>
+      <div class="slider" data-key="seed" data-min="0" data-max="100" data-step="0.1" data-label="Seed"></div>
+    </details>
+
+    <details open>
+      <summary data-i18n="grain">Grain</summary>
+      <div class="slider" data-key="grain" data-min="0" data-max="0.6" data-step="0.005" data-label="Amount"></div>
+      <div class="slider" data-key="grainSize" data-min="0.5" data-max="6" data-step="0.1" data-label="Size (px)"></div>
+      <div class="ctrl">
+        <label data-i18n="grainType">Type</label>
+        <select id="grainType">
+          <option value="0">Mono</option>
+          <option value="1">Color</option>
+          <option value="2">Film (soft-light)</option>
+        </select>
+      </div>
+      <label class="chk"><input type="checkbox" id="grainAnim"> <span data-i18n="grainAnim">Animated grain</span></label>
+    </details>
+
+    <details>
+      <summary data-i18n="adjust">Adjustments</summary>
+      <div class="slider" data-key="brightness" data-min="-0.5" data-max="0.5" data-step="0.01" data-label="Brightness"></div>
+      <div class="slider" data-key="contrast" data-min="0.3" data-max="2" data-step="0.01" data-label="Contrast"></div>
+      <div class="slider" data-key="saturation" data-min="0" data-max="2" data-step="0.01" data-label="Saturation"></div>
+      <div class="slider" data-key="hue" data-min="-180" data-max="180" data-step="1" data-label="Hue shift"></div>
+      <div class="slider" data-key="vignette" data-min="0" data-max="1.5" data-step="0.01" data-label="Vignette"></div>
+      <div class="slider" data-key="blur" data-min="0" data-max="1" data-step="0.01" data-label="Dither / smooth"></div>
+    </details>
+
+    <details>
+      <summary data-i18n="anim">Animation</summary>
+      <div class="slider" data-key="speed" data-min="0" data-max="3" data-step="0.01" data-label="Speed"></div>
+      <div class="slider" data-key="flow" data-min="0" data-max="1" data-step="0.01" data-label="Point drift"></div>
+    </details>
+
+    <details open>
+      <summary data-i18n="size">Canvas size</summary>
+      <div class="ratios" id="ratios"></div>
+      <div class="row gap">
+        <input type="number" id="w" min="16" max="8192"> ×
+        <input type="number" id="h" min="16" max="8192">
+        <span class="muted">px</span>
+      </div>
+    </details>
+
+    <details>
+      <summary data-i18n="project">Project</summary>
+      <div class="row gap wrap">
+        <button id="btnSaveJson" class="small ghost" data-i18n="saveJson">Save .json</button>
+        <button id="btnLoadJson" class="small ghost" data-i18n="loadJson">Load .json</button>
+        <button id="btnSavePreset" class="small ghost" data-i18n="savePreset">Save as my preset</button>
+        <button id="btnCss" class="small ghost" data-i18n="css">Copy CSS (fallback)</button>
+        <input type="file" id="fileJson" accept=".json,application/json" hidden>
+      </div>
+    </details>
+  </aside>
+</main>
+
+<dialog id="exportDlg">
+  <form method="dialog" class="dlg">
+    <h3 data-i18n="exportTitle">Export</h3>
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="img" data-i18n="image">Image</button>
+      <button type="button" class="tab" data-tab="vid" data-i18n="video">Video</button>
+    </div>
+    <div class="tabpane" data-pane="img">
+      <div class="ctrl"><label data-i18n="format">Format</label>
+        <select id="exFormat"><option value="png">PNG</option><option value="jpeg">JPG</option><option value="webp">WebP</option></select></div>
+      <div class="ctrl"><label data-i18n="scale">Scale</label>
+        <select id="exScale"><option value="1">1×</option><option value="2">2×</option><option value="3">3×</option><option value="4">4×</option></select></div>
+      <div class="ctrl"><label data-i18n="quality">Quality</label><input type="range" id="exQuality" min="0.5" max="1" step="0.01" value="0.95"></div>
+      <p class="muted" id="exInfo"></p>
+    </div>
+    <div class="tabpane hidden" data-pane="vid">
+      <div class="ctrl"><label data-i18n="duration">Duration (s)</label><input type="number" id="vDur" value="6" min="1" max="60"></div>
+      <div class="ctrl"><label>FPS</label><select id="vFps"><option>30</option><option selected>60</option><option>24</option></select></div>
+      <div class="ctrl"><label data-i18n="vres">Max side (px)</label><select id="vRes"><option>720</option><option selected>1080</option><option>1440</option><option>2160</option></select></div>
+      <div class="ctrl"><label data-i18n="bitrate">Bitrate (Mbps)</label><input type="number" id="vBit" value="16" min="2" max="80"></div>
+      <label class="chk"><input type="checkbox" id="vLoop" checked> <span data-i18n="loop">Seamless loop</span></label>
+      <p class="muted" id="vInfo"></p>
+      <div class="progress hidden" id="vProg"><div></div></div>
+    </div>
+    <div class="row gap end">
+      <button value="cancel" class="ghost" data-i18n="cancel">Cancel</button>
+      <button type="button" id="doExport" class="primary" data-i18n="download">Download</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast"></div>
+
+<script src="js/presets.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
